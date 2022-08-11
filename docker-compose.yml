@@ -1,0 +1,45 @@
+version: "3.9"
+services:
+  app:
+    build:
+      context: .
+      dockerfile: dockerfile
+    image: nodejs
+    container_name: app
+    restart: unless-stopped
+    ports:
+      - 4000:4000
+    volumes:
+      - ./:/usr/app
+      - /usr/app/node_modules
+  mongodb:
+    image: mongo:5.0
+    container_name: mongodb1
+    ports:
+      - 27028:27017
+    volumes:
+      - ~/apps/mongo:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=finance1
+      - MONGO_INITDB_ROOT_PASSWORD=finance1
+  jenkins:
+    image: jenkins/jenkins:lts
+    restart: unless-stopped
+    privileged: true
+    user: root
+    ports:
+      - 8080:8080
+      - 50000:50000
+    container_name: jenkins
+    volumes:
+      - /home/${myname}/jenkins_compose/jenkins_configuration:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+  agent:
+    image: jenkins/ssh-agent:jdk11
+    privileged: true
+    user: root
+    container_name: agent
+    expose:
+      - 22
+    environment:
+      - JENKINS_AGENT_SSH_PUBKEY=ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC6QTVITsutwkiIg5MtgOQNfmu+n8/hI28Kaa96A6fixJ6J1T/6oPp/ZCGPayDv254w7+qevkgRnXDs6+JbDePQmvwnRbifuf1kAi9D3KcKnb3CAt2BRMcZyRaKgEFdCml37yUlYNypTvLV61aj8cMoMnHDCHT8TFWPJaDHafvjUOPtDRt0u380+MwEQx/Xa3RD0vegBYp1tjwPZAAF3lbE8mDUCrnhz3kXOO0v5Pooww4uQFZ+oWhbCoRRZ+//0omXJfFd8Dl274saN/jRtxSWBpi3KXxYHoIpflOI2ia6FQjcwzmQsTRSUfmpHHpd7P+5OWl++XqhNaxb0nNvAZ4RcMBepujeTADHB7y75IFIOm5kbjIQUrJBHSpym/+XEn2pQ8a1uUNspu8stnrg7US+nj/nLbXTvxTDuk5vXD0XXwXlONN4qzYkVik+ErCmXHNzuLF/KprllZhfhw2n89QFvZOVeptdq5U7a77j2I2E7Pp3W5EL7Q0KsvycWLF1wiHJw/h6YXBFUSDAWrxQnOYWDuWKkfdX+BFv8wRXArl1QnOPRppqNPRJ2sQC0Lk2x6LwtiAxWLnEYM+oqp+R26acOmREPTqAiUZxmMLYeqjKK335jAlvkAvn2UycFBq6hOnSIB+8PFFylPq+3AVpLPt7ckPWI578lAXCnEtOsm2/tw== erdenemunkh@anonym0us
